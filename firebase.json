@@ -1,6 +1,5 @@
 {
   "hosting": {
-    "site": "cartel-sw",
     "public": "dist",
     "ignore": [
       "firebase.json",

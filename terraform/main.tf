@@ -1,10 +1,7 @@
 terraform {
   required_version = ">= 1.5.0"
 
-  backend "gcs" {
-    bucket = "cartel-sw-tfstate"
-    prefix = "terraform/state"
-  }
+  backend "gcs" {}
 
   required_providers {
     google = {
@@ -48,6 +45,22 @@ resource "google_project_service" "identitytoolkit" {
   service = "identitytoolkit.googleapis.com"
 
   disable_on_destroy = false
+}
+
+resource "google_identity_platform_config" "auth" {
+  provider = google-beta
+  project  = var.project_id
+
+  sign_in {
+    email {
+      enabled           = true
+      password_required = true
+    }
+  }
+
+  depends_on = [
+    google_project_service.identitytoolkit
+  ]
 }
 
 resource "google_project_service" "firebase" {

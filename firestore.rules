@@ -1,0 +1,68 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper: Checks if the user is authenticated.
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Helper: Checks if the user's uid matches the owner of the document.
+    // Supports both 'uid' and 'ownerUid' fields for maximum compatibility.
+    function isOwner(resourceData) {
+      return (resourceData.uid != null && resourceData.uid == request.auth.uid) ||
+             (resourceData.ownerUid != null && resourceData.ownerUid == request.auth.uid);
+    }
+
+    // Dossier Isolation Rules: /players/{username}
+    match /players/{username} {
+      
+      // Reading player dossiers is restricted to the authenticated owner.
+      allow read: if isAuthenticated() && isOwner(resource.data);
+
+      // Creating a player profile requires identity validation, document-to-alias matching,
+      // and type-safe turn and liquidity validation.
+      allow create: if isAuthenticated() 
+                    && isOwner(request.resource.data)
+                    && request.resource.data.username == username
+                    && request.resource.data.username is string
+                    && request.resource.data.isPremium is bool
+                    && request.resource.data.money is number
+                    && request.resource.data.turns is int
+                    && request.resource.data.heat is number
+                    && (request.resource.data.isPremium == true || request.resource.data.turns <= 100);
+
+      // Updating a player profile requires ownership verification of both the source
+      // and target data state, field-level immutability for critical keys (uid, username),
+      // and server-side enforcement of turn caps based on premium state.
+      allow update: if isAuthenticated()
+                    && isOwner(resource.data)
+                    && isOwner(request.resource.data)
+                    && request.resource.data.username == resource.data.username
+                    && request.resource.data.isPremium is bool
+                    && request.resource.data.money is number
+                    && request.resource.data.turns is int
+                    && request.resource.data.heat is number
+                    && (request.resource.data.isPremium == true || request.resource.data.turns <= 100);
+
+      // Players cannot delete their profile documents.
+      allow delete: if false;
+    }
+
+    // Username Registration Protection Rules: /usernames/{username}
+    match /usernames/{username} {
+      
+      // Any authenticated user can read username mappings to check existence or verify ownership.
+      allow read: if isAuthenticated();
+
+      // Creating a username mapping requires authentication and prevents claiming another UID.
+      allow create: if isAuthenticated()
+                    && resource == null
+                    && request.resource.data.ownerUid == request.auth.uid
+                    && request.resource.data.ownerUid is string;
+
+      // Username mappings are immutable once created. They can never be updated or deleted.
+      allow update, delete: if false;
+    }
+  }
+}

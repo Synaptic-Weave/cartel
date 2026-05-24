@@ -116,6 +116,7 @@ export default function LoginView({ onLoginComplete }) {
             money: 12000,
             turns: 50,
             heat: 0,
+            isPremium: false,
             createdAt: new Date().toISOString()
           });
         } catch (profileError) {

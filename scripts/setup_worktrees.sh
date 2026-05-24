@@ -37,8 +37,11 @@ setup_agent_worktree() {
   local agent_name=$1
   local branch_name="feat/${agent_name}-dev"
   local target_dir=".worktrees/${agent_name}"
+  
+  # Capitalize agent name for logging (POSIX compatible)
+  local cap_name=$(echo "$agent_name" | tr 'a-z' 'A-Z')
 
-  echo -e "${CYAN}[INFO] Configuring worktree for agent: ${agent_name^}...${NC}"
+  echo -e "${CYAN}[INFO] Configuring worktree for agent: ${cap_name}...${NC}"
 
   # Check if worktree directory exists or is registered
   if git worktree list | grep -q "$target_dir"; then
@@ -65,7 +68,7 @@ setup_agent_worktree() {
     git worktree add -b "$branch_name" "$target_dir" main
   fi
 
-  echo -e "${GREEN}[SUCCESS] Worktree setup for ${agent_name^} at ${target_dir} is active!${NC}"
+  echo -e "${GREEN}[SUCCESS] Worktree setup for ${cap_name} at ${target_dir} is active!${NC}"
 }
 
 # 3. Setup worktrees for developers Apoc and Ghost

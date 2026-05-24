@@ -8,7 +8,8 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "vitest run"
+    "test": "vitest run",
+    "env:gen": "node scripts/generate_env.js"
   },
   "dependencies": {
     "firebase": "^12.13.0",

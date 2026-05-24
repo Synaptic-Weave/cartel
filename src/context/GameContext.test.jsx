@@ -1,5 +1,4 @@
 // @vitest-environment jsdom
-import React from 'react';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 // Define Firebase mocks BEFORE importing GameContext
@@ -26,7 +25,9 @@ vi.mock('firebase/firestore', () => {
           if (saved) {
             try {
               store[path] = JSON.parse(saved);
-            } catch (e) {}
+            } catch {
+              // Ignore JSON parse errors
+            }
           }
         }
       }
@@ -105,7 +106,7 @@ vi.mock('../config/firebase', () => ({
   auth: {}
 }));
 
-import { render, act, screen } from '@testing-library/react';
+import { render, act } from '@testing-library/react';
 import { GameProvider, useGame } from './GameContext';
 
 // Robust in-memory localStorage mock for testing environment isolation

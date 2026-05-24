@@ -56,7 +56,7 @@ resource "google_firestore_database" "default" {
   project     = var.project_id
   name        = "(default)"
   location_id = var.region
-  type        = "FIRESTORE_PRIMARY"
+  type        = "FIRESTORE_NATIVE"
 
   # Delete protection is active in production, disabled in sandbox environments
   delete_protection_state = var.environment == "prod" ? "DELETE_PROTECTION_ENABLED" : "DELETE_PROTECTION_DISABLED"

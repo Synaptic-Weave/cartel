@@ -30,3 +30,8 @@ scratch
 # Git Worktrees
 .worktrees
 
+# Terraform Local State and Plugins
+.terraform/
+*.tfstate
+*.tfstate.backup
+.terraform.lock.hcl

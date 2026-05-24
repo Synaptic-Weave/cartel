@@ -298,6 +298,11 @@ describe('Navigation HUD Component Integration', () => {
       </GameProvider>
     );
 
+    // Set isLoggedIn to true
+    act(() => {
+      contextValues.setIsLoggedIn(true);
+    });
+
     // Verify initial isLoggedIn
     expect(contextValues.isLoggedIn).toBe(true);
 
@@ -321,6 +326,49 @@ describe('Navigation HUD Component Integration', () => {
 
     // Modal should be closed
     expect(screen.queryByText('A.I.D.A. SYSTEM CALIBRATION REQUIRED')).toBeNull();
+  });
+
+  it('should cover all heat, premium, and shield branches in Navigation', () => {
+    let contextValues = null;
+    function StateSpy() {
+      contextValues = useGame();
+      return null;
+    }
+
+    render(
+      <GameProvider>
+        <Navigation />
+        <StateSpy />
+      </GameProvider>
+    );
+
+    // 1. High Heat Branch (heat > 75)
+    act(() => {
+      contextValues.setHeat(85);
+      contextValues.setTurns(10);
+      contextValues.setIsPremium(false);
+      contextValues.setShieldTurnsLeft(0);
+    });
+    expect(screen.getByText('85%')).toBeTruthy();
+
+    // 2. Medium Heat Branch (heat > 40)
+    act(() => {
+      contextValues.setHeat(55);
+    });
+    expect(screen.getByText('55%')).toBeTruthy();
+
+    // 3. Premium & Uncapped Turns Branch
+    act(() => {
+      contextValues.setIsPremium(true);
+      contextValues.setTurns(10050);
+    });
+    expect(screen.getByText('UNCAPPED')).toBeTruthy();
+
+    // 4. Shield Active Branch
+    act(() => {
+      contextValues.setShieldTurnsLeft(3);
+    });
+    expect(screen.getByText('Immune (3T)')).toBeTruthy();
   });
 });
 

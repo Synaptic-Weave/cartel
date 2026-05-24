@@ -1,0 +1,29 @@
+name: MegaLinter
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  megalinter:
+    name: MegaLinter Analysis
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Full git history required for changed-files detection
+
+      - name: Run MegaLinter
+        name: MegaLinter Quality Gate
+        uses: oxsecurity/megalinter@v8
+        env:
+          # Run only on changed files to keep pull request audits extremely fast and efficient
+          VALIDATE_ALL_CODEBASE: false
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

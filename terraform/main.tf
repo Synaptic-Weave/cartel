@@ -102,3 +102,24 @@ resource "google_firebase_hosting_site" "default" {
   ]
 }
 
+# -------------------------------------------------------------
+# Firebase Web App Registration & Configuration
+# -------------------------------------------------------------
+
+resource "google_firebase_web_app" "default" {
+  provider     = google-beta
+  project      = var.project_id
+  display_name = "Cartel Game App"
+
+  depends_on = [
+    google_firebase_project.default
+  ]
+}
+
+data "google_firebase_web_app_config" "default" {
+  provider   = google-beta
+  project    = var.project_id
+  web_app_id = google_firebase_web_app.default.app_id
+}
+
+

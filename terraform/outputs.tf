@@ -16,3 +16,19 @@ output "project_services" {
   ]
   description = "The list of bootstrapped and enabled GCP services"
 }
+
+# -------------------------------------------------------------
+# Firebase Client SDK Credentials Configuration Block
+# -------------------------------------------------------------
+
+output "firebase_config" {
+  value = {
+    apiKey            = data.google_firebase_web_app_config.default.api_key
+    authDomain        = data.google_firebase_web_app_config.default.auth_domain
+    projectId         = var.project_id
+    storageBucket     = data.google_firebase_web_app_config.default.storage_bucket
+    messagingSenderId = data.google_firebase_web_app_config.default.messaging_sender_id
+    appId             = google_firebase_web_app.default.app_id
+  }
+  description = "The client SDK credentials used to initialize the frontend interface"
+}
